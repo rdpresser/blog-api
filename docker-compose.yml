@@ -1,6 +1,7 @@
 services:
   blogapi:
     image: blogapi
+    container_name: blogapi
     build:
       context: .
       dockerfile: ./Dockerfile
@@ -8,3 +9,28 @@ services:
       NODE_ENV: production
     ports:
       - 3000:3000
+    networks:
+      - my-network
+    depends_on:
+      - blogapi-db
+  
+  blogapi-db:
+    image: postgres:latest
+    container_name: blogapi-db
+    environment:
+      POSTGRES_DB: blogapi_db
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    ports:
+      - '54322:5432'
+    networks:
+      - my-network
+
+networks:
+  my-network:
+    driver: bridge
+
+volumes:
+  postgres_data:

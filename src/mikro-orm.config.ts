@@ -4,11 +4,11 @@ import { TsMorphMetadataProvider } from '@mikro-orm/reflection';
 const config: Options = {
   // for simplicity, we use the PostgreSQL database
   driver: PostgreSqlDriver,
-  dbName: 'postgres.db',
+  dbName: 'blogapi_db',
   user: 'postgres',
   password: 'postgres',
-  host: 'localhost',
-  port: 15432,
+  host: 'blogapi-db',
+  port: 5432,
   // folder-based discovery setup, using common filename suffix
   entities: ['dist/**/*.entity.js'],
   entitiesTs: ['src/**/*.entity.ts'],

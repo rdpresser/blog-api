@@ -6,7 +6,8 @@ services:
       dockerfile: ./Dockerfile
     environment:
       NODE_ENV: development
+      DB_CONNECTION_STRING: postgres://postgres:postgres@blogapi-db:5432/blogapi_db
     ports:
       - 3000:3000
       - 9229:9229
-    command: ["node", "--inspect=0.0.0.0:9229", "dist/index.js"]
+    command: ["node", "--inspect=0.0.0.0:9229", "dist/server.js"]

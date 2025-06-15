@@ -3,7 +3,7 @@
   "version": "1.0.0",
   "type": "module",
   "description": "",
-  "main": "dist/index.js",
+  "main": "dist/server.js",
   "keywords": [],
   "author": "",
   "license": "ISC",

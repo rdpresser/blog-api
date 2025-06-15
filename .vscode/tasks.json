@@ -34,6 +34,29 @@
 			"node": {
 				"enableDebugging": true
 			}
+		},
+		{
+			"label": "docker-compose: debug",
+			"type": "shell",
+			"command": "docker-compose -f docker-compose.yml -f docker-compose.debug.yml build --no-cache && docker-compose -f docker-compose.yml -f docker-compose.debug.yml up --force-recreate -d",
+			"isBackground": true,
+			"problemMatcher": [
+				{
+					"pattern": [
+						{
+							"regexp": ".",
+							"file": 1,
+							"location": 2,
+							"message": 3
+						}
+					],
+					"background": {
+						"activeOnStart": true,
+						"beginsPattern": "Attaching to",
+						"endsPattern": "Debugger listening"
+					}
+				}
+			]
 		}
 	]
 }
