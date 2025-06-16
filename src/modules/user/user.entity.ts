@@ -1,11 +1,11 @@
-import { Entity, PrimaryKey, Property } from '@mikro-orm/core';
-import { v4 as uuid } from 'uuid';
+import { BeforeCreate, BeforeUpdate, Collection, Entity, EventArgs, OneToMany, PrimaryKey, Property } from '@mikro-orm/core';
+import { BaseEntity } from '../common/base.entity.js';
+import crypto from 'crypto';
+import { Article } from '../article/article.entity.js';
+import { hash, verify } from 'argon2';
 
 @Entity()
-export class User {
-
-   @PrimaryKey({ type: 'uuid' })
-   id: string = uuid();
+export class User extends BaseEntity<'bio'> {
 
    @Property()
    fullName!: string;
@@ -13,9 +13,34 @@ export class User {
    @Property()
    email!: string;
 
-   @Property()
-   password!: string;
+   @Property({ hidden: true, lazy: true })
+   password: string;
 
-   @Property({ type: 'text', length: 1000 })
+   @Property({ type: 'text' })
    bio: string = '';
+
+  @OneToMany({ mappedBy: 'author' })
+  articles = new Collection<Article>(this);
+
+   constructor(fullName: string, email: string, password: string) {
+    super();
+    this.fullName = fullName;
+    this.email = email;
+    this.password = password; // keep plain text, will be hashed via hooks
+  }
+
+  @BeforeCreate()
+  @BeforeUpdate()
+  async hashPassword(args: EventArgs<User>) {
+    // hash only if the password was changed
+    const password = args.changeSet?.payload.password;
+
+    if (password) {
+      this.password = await hash(password);
+    }
+  }
+
+  async verifyPassword(password: string) {
+    return await verify(this.password, password);
+  }
 }

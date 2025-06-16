@@ -2,6 +2,19 @@
     "configurations": [
         {
             "type": "node",
+            "request": "launch",
+            "name": "Launch App",
+            "program": "${workspaceFolder}/dist/server.js",
+            "preLaunchTask": "tsc: build - tsconfig.json",
+            "outFiles": ["${workspaceFolder}/dist/**/*.js"],
+            "cwd": "${workspaceFolder}",
+            "console": "integratedTerminal",
+            "env": {
+                "NODE_ENV": "development"
+            }
+        },
+        {
+            "type": "node",
             "request": "attach",
             "name": "Attach to Docker Compose: Node.js",
             "address": "localhost",

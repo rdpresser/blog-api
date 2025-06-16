@@ -1,6 +1,11 @@
-import { MikroORM } from '@mikro-orm/postgresql';
+import { LoadStrategy, MikroORM, wrap } from '@mikro-orm/postgresql';
 import config from './mikro-orm.config.js';
 import { User } from './modules/user/user.entity.js';
+import { Article } from './modules/article/article.entity.js';
+import dotenv from 'dotenv';
+import { Tag } from './modules/article/tag.entity.js';
+
+dotenv.config();
 
 const orm = await MikroORM.init(config);
 
@@ -8,10 +13,8 @@ const orm = await MikroORM.init(config);
 await orm.schema.refreshDatabase();
 
 // create new user entity instance
-const user = new User();
-user.email = 'foo@bar.com';
-user.fullName = 'Foo Bar';
-user.password = '123456';
+const user = new User('Author Foo Bar', 'foo@bar.com', '123456');
+console.log(user);
 
 // fork first to have a separate context
 const em = orm.em.fork();
@@ -19,39 +22,86 @@ const em = orm.em.fork();
 // first mark the entity with `persist()`, then `flush()`
 await em.persist(user).flush();
 
-// after the entity is flushed, it becomes managed, and has the PK available
-console.log('user id is:', user.id);
+// clear the context to simulate fresh request
+em.clear();
 
-// user entity is now managed, if we try to find it again, we get the same reference
-const myUser = await em.findOne(User, user.id);
-console.log('users are the same?', user === myUser);
+// create the article instance
+const article = em.create(Article, {
+  title: 'Article Foo is Bar',
+  text: 'Lorem impsum dolor sit amet',
+  author: user.id,
+  //slug: 'foo',
+  //description: 'Foo is bar',
+});
 
-// modifying the user and flushing yields update queries
-user.bio = '...';
+console.log('it really is a User', article.author instanceof User); // true
+console.log('but not initialized', wrap(article.author).isInitialized()); // false
+
+// `em.create` calls `em.persist` automatically, so flush is enough
 await em.flush();
+console.log(article);
 
-// now try to create a new fork, does not matter if from `orm.em` or our existing `em` fork, as by default we get a clean one
-const em2 = em.fork();
-console.log('verify the EM ids are different:', em.id, em2.id);
-const myUser2 = await em2.findOneOrFail(User, user.id);
-console.log(
-  'users are no longer the same, as they came from differnet EM:',
-  user === myUser2
-);
+// clear the context to simulate fresh request
+em.clear();
 
-// change the user
-myUser2.bio = 'changed';
+// find article by id and populate its author
+// const articleWithAuthor = await em.findOne(Article, article.id, {
+//   populate: ['author', 'text'],
+// });
+// const articleWithAuthor = await em.findOne(Article, article.id, {
+//   populate: ['author'],
+// });
+// await em.populate(articleWithAuthor!, ['text']);
 
-// reload user with `em.refresh()`
-await em2.refresh(myUser2);
-console.log('changes are lost', myUser2);
+const articleWithAuthor = await em.findOne(Article, article.id, {
+  populate: ['author', 'text'],
+  strategy: LoadStrategy.JOINED,
+});
+console.log(articleWithAuthor);
 
-// let's try again
-myUser2!.bio = 'some change, will be saved';
-await em2.flush();
+// clear the context to simulate fresh request
+em.clear();
 
-// finally, remove the entity
-//await em2.remove(myUser2).flush();
+// populating User.articles collection
+// const user2 = await em.findOneOrFail(User, user.id, { populate: ['articles'] });
+// console.log(user2);
+
+const user2 = await em.findOneOrFail(User, user.id);
+console.log(user);
+
+user2.password = 'new-password'; // change the password, it will be hashed automatically
+user2.email = 'rodrigo@testes.com.br'; // change the email, it will be updated automatically
+await em.flush(); // flush the changes
+
+// or you could lazy load the collection later via `init()` method
+// if (!user2.articles.isInitialized()) {
+//   await user2.articles.init();
+// }
+
+// to ensure collection is loaded (but do nothing if it already is), use `loadItems()` method
+await user2.articles.loadItems();
+
+for (const article of user2.articles) {
+   console.log(article.title);
+   console.log(article.author.fullName); // the `article.author` is linked automatically thanks to the Identity Map
+}
+
+// create some tags and assign them to the first article
+const [article2] = user2.articles;
+const newTag = em.create(Tag, { name: 'new' });
+const oldTag = em.create(Tag, { name: 'old' });
+article2.tags.add(newTag, oldTag);
+await em.flush();
+console.log(article2.tags);
+
+// to remove items from collection, we first need to initialize it, we can use `init()`, `loadItems()` or `em.populate()`
+await em.populate(article2, ['tags']);
+
+// remove 'old' tag by reference
+article.tags.remove(oldTag);
+
+// or via callback
+article.tags.remove(t => t.id === oldTag.id);
 
 // close the ORM, otherwise the process would keep going indefinitely
 await orm.close();

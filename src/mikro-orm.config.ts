@@ -5,10 +5,10 @@ const config: Options = {
   // for simplicity, we use the PostgreSQL database
   driver: PostgreSqlDriver,
   dbName: 'blogapi_db',
-  user: 'postgres',
-  password: 'postgres',
-  host: 'blogapi-db',
-  port: 5432,
+  user: process.env.DB_USER || 'postgres',
+  password: process.env.DB_PASSWORD || 'postgres',
+  host: process.env.DB_HOST || 'localhost',
+  port: process.env.DB_PORT ? Number(process.env.DB_PORT) : 54322,
   // folder-based discovery setup, using common filename suffix
   entities: ['dist/**/*.entity.js'],
   entitiesTs: ['src/**/*.entity.ts'],
