@@ -6,7 +6,13 @@
     "strict": true,
     "outDir": "./dist",
     "declaration": true,
-    "experimentalDecorators": true
+    "rootDir": "./src",
+    "baseUrl": "./src",
+    "typeRoots": ["node_modules/@types"],
+    "types": ["node"],
+    "experimentalDecorators": true,
+    "emitDecoratorMetadata": true,
+    "sourceMap": true,
   },
   "include": [
     "./src/**/*.ts"

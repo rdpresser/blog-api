@@ -17,6 +17,8 @@ const config: Options = {
   metadataProvider: TsMorphMetadataProvider,
   // enable debug mode to log SQL queries and discovery information
   debug: true,
+  serialization: { forceObject: true },
+  dynamicImportProvider: id => import(id),
 };
 
 export default config;
