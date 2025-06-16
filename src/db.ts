@@ -20,6 +20,22 @@ export async function initORM(options?: Options): Promise<Services> {
 
   const orm = await MikroORM.init(options);
 
+  if (options?.dbName === ':memory:') {
+    await orm.schema.refreshDatabase();
+  } else {
+    // create the schema so we can use the database -- Future versions, change to call migrations instead
+    if (!await orm.schema.ensureDatabase()) {
+      // If schema does not exist, create it from scratch
+      await orm.schema.createSchema();
+    } else {
+      // If schema exists, check for pending updates and apply them
+      const pendingUpdates = await orm.schema.getUpdateSchemaSQL();
+      if (pendingUpdates && pendingUpdates.trim().length > 0) {
+        await orm.schema.updateSchema();
+      }
+    }
+  }
+
   // save to cache before returning
   return cache = {
     orm,

@@ -11,16 +11,11 @@ export async function initTestApp(port: number, host: string = '0.0.0.0') {
     debug: false,
     // we will use in-memory database, this way we can easily parallelize our tests
     dbName: ':memory:',
+    connect: false, // we will not connect to the database, as it is in-memory
     // this will ensure the ORM discovers TS entities, with ts-node, ts-jest and vitest
     // it will be inferred automatically, but we are using vitest here
     // preferTs: true,
   });
-
-  // recreate the database schema
-  await orm.schema.refreshDatabase();
-
-  // create the schema so we can use the database
-  //await orm.schema.createSchema();
 
   const { app } = await bootstrap(port, host);
 
