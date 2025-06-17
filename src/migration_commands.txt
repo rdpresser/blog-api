@@ -1,0 +1,19 @@
+https://mikro-orm.io/docs/migrations
+
+npx mikro-orm-esm migration:create   # Create new migration with current schema diff
+npx mikro-orm-esm migration:up       # Migrate up to the latest version
+npx mikro-orm-esm migration:down     # Migrate one step down
+npx mikro-orm-esm migration:list     # List all executed migrations
+npx mikro-orm-esm migration:check    # Check if schema is up to date
+npx mikro-orm-esm migration:pending  # List all pending migrations
+npx mikro-orm-esm migration:fresh    # Drop the database and migrate up to the latest version
+
+
+npx mikro-orm-esm migration:up --from 2019101911 --to 2019102117  # the same as above
+npx mikro-orm-esm migration:up --only 2019101923                  # apply a single migration
+npx mikro-orm-esm migration:down --to 0                           # migrate down all migrations
+
+To generate the SQL script based on your MikroORM migration files, run:
+npx mikro-orm-esm schema:create --dump  # Dumps create schema SQL
+npx mikro-orm-esm schema:update --dump  # Dumps update schema SQL
+npx mikro-orm-esm schema:drop --dump    # Dumps drop schema SQL

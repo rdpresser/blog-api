@@ -2,6 +2,8 @@ import { User } from './modules/user/user.entity.js';
 import { Article } from './modules/article/article.entity.js';
 import { Tag } from './modules/article/tag.entity.js';
 import { EntityManager, EntityRepository, MikroORM, Options } from '@mikro-orm/postgresql';
+import { TestSeeder } from './seeders/TestSeeder.js';
+import config from './mikro-orm.config.js';
 
 export interface Services {
   orm: MikroORM;
@@ -13,28 +15,23 @@ export interface Services {
 
 let cache: Services;
 
-export async function initORM(options?: Options): Promise<Services> {
+export async function initORM(options?: Options, migrate = true): Promise<Services> {
   if (cache) {
     return cache;
   }
 
-  const orm = await MikroORM.init(options);
+  // allow overriding config options for testing
+  const orm = await MikroORM.init({
+    ...config,
+    ...options,
+  });
 
-  if (options?.dbName === ':memory:') {
-    await orm.schema.refreshDatabase();
-  } else {
-    // create the schema so we can use the database -- Future versions, change to call migrations instead
-    if (!await orm.schema.ensureDatabase()) {
-      // If schema does not exist, create it from scratch
-      await orm.schema.createSchema();
-    } else {
-      // If schema exists, check for pending updates and apply them
-      const pendingUpdates = await orm.schema.getUpdateSchemaSQL();
-      if (pendingUpdates && pendingUpdates.trim().length > 0) {
-        await orm.schema.updateSchema();
-      }
-    }
+  if (migrate) {
+    // sync the schema
+    await orm.migrator.up();
   }
+
+  await orm.seeder.seed(TestSeeder);
 
   // save to cache before returning
   return cache = {

@@ -1,4 +1,3 @@
-import { Services } from './../../../src/db';
 import { afterAll, beforeAll, expect, test } from 'vitest';
 import { FastifyInstance } from 'fastify';
 import { initTestApp } from '../../common/utils.js';
@@ -7,7 +6,7 @@ let app: FastifyInstance;
 
 beforeAll(async () => {
   // we use different ports to allow parallel testing
-  app = await initTestApp(30001, '0.0.0.0');
+  app = await initTestApp(30001, '0.0.0.0', true);
 });
 
 afterAll(async () => {
@@ -26,8 +25,13 @@ test('list all articles', async () => {
   expect(res.statusCode).toBe(200);
 
   // with expected shape
-  expect(res.json()).toMatchObject({
-    items: [],
-    total: 0,
+  const data = res.json();
+  expect(data).toMatchObject({
+    items: expect.any(Array),
+    total: expect.any(Number),
   });
+
+  expect(data.items.length).toBeGreaterThan(0);
+  expect(data.total).toBeGreaterThan(0);
+
 });

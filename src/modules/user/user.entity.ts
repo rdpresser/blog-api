@@ -1,6 +1,5 @@
-import { BeforeCreate, BeforeUpdate, Collection, Entity, EventArgs, OneToMany, PrimaryKey, Property } from '@mikro-orm/core';
+import { BeforeCreate, BeforeUpdate, Collection, Entity, EventArgs, OneToMany, Property } from '@mikro-orm/core';
 import { BaseEntity } from '../common/base.entity.js';
-import crypto from 'crypto';
 import { Article } from '../article/article.entity.js';
 import { hash, verify } from 'argon2';
 

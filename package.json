@@ -1,24 +1,29 @@
 {
-  "name": "blog-api",
+  "name": "blog-api-self-learning-mikro-orm",
   "version": "1.0.0",
   "type": "module",
-  "description": "",
+  "description": "Mikro ORM based blog API with PostgreSQL",
+  "repository": "https://github.com/rdpresser/blog-api",
+  "author": "Rodrigo Presser",
   "main": "dist/server.js",
   "keywords": [],
-  "author": "",
   "license": "ISC",
   "packageManager": "pnpm@10.12.1",
   "dependencies": {
+    "@faker-js/faker": "^9.8.0",
     "@mikro-orm/core": "^6.4.16",
+    "@mikro-orm/migrations": "^6.4.16",
     "@mikro-orm/postgresql": "^6.4.16",
     "@mikro-orm/reflection": "^6.4.16",
+    "@mikro-orm/seeder": "^6.4.16",
+    "@mikro-orm/sql-highlighter": "^1.0.1",
     "argon2": "^0.43.0",
     "fastify": "^5.4.0",
     "uuid": "^11.1.0"
   },
   "devDependencies": {
     "@mikro-orm/cli": "^6.4.16",
-    "@types/node": "^24.0.1",
+    "@types/node": "^24.0.3",
     "@types/uuid": "^10.0.0",
     "dotenv": "^16.5.0",
     "rimraf": "^6.0.1",
@@ -28,9 +33,17 @@
   },
   "scripts": {
     "clean": "rimraf dist",
+    "orm-cache-combined": "npx mikro-orm-esm cache:generate --combined", 
+    "db:migrate:create": "npx mikro-orm-esm migration:create --name ",
+    "db:migrate:up": "npx mikro-orm-esm migration:up",
+    "db:migrate:down": "npx mikro-orm-esm migration:down",
+    "db:migrate:reset": "npx mikro-orm-esm migration:down --to 0",
+    "db:schema:drop": "npx mikro-orm-esm schema:drop --run",
+    "db:seed": "npx mikro-orm-esm seeder:run",
     "build": "pnpm run clean && tsc",
     "start": "node --no-warnings=ExperimentalWarning dist/server.js",
     "build-and-start": "pnpm run build && pnpm start",
+    "upgrade-deps": "npm-check-updates -u && pnpm install",
     "test": "vitest"
   }
 }

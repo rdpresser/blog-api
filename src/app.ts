@@ -2,8 +2,8 @@ import { RequestContext } from '@mikro-orm/core';
 import { fastify } from 'fastify';
 import { initORM } from './db.js';
 
-export async function bootstrap(port = 3000, host = '0.0.0.0') {
-  const db = await initORM();
+export async function bootstrap(port = 3000, host = '0.0.0.0', migrate = true) {
+  const db = await initORM({}, migrate);
   const app = fastify();
 
   // register request context hook
