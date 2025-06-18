@@ -4,19 +4,18 @@ import { User } from './user.entity.js';
 
 export async function registerUserRoutes(app: FastifyInstance) {
   // register new user
-  app.post('/sign-up', async request => {
-    const body = request.body as EntityData<User>;
+  app.post<{ Body: EntityData<User> }>('/sign-up', async request => {
 
-    if (!body.email || !body.fullName || !body.password) {
+    if (!request.body.email || !request.body.fullName || !request.body.password) {
       throw new Error('One of required fields is missing: email, fullName, password');
     }
 
-    if (await request.user.exists(body.email)) {
+    if (await request.user.exists(request.body.email)) {
       throw new Error('This email is already registered, maybe you want to sign in?');
     }
 
-    const user = new User(body.fullName, body.email, body.password);
-    user.bio = body.bio ?? '';
+    const user = new User(request.body.fullName, request.body.email, request.body.password);
+    user.bio = request.body.bio ?? '';
     await request.em.persist(user).flush();
 
     // after flush, we have the `user.id` set

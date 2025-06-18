@@ -8,12 +8,12 @@ import fp from 'fastify-plugin';
 
 const ormPlugin: FastifyPluginAsync<{ orm: MikroORM }> = async (fastify, opts) => {
   fastify.decorate('orm', opts.orm);
-
-  fastify.decorateRequest('em', null as any);
-  fastify.decorateRequest('article', null as any);
-  fastify.decorateRequest('user', null as any);
-  fastify.decorateRequest('comment', null as any);
-  fastify.decorateRequest('tag', null as any);
+  
+  fastify.decorateRequest('em', null!);
+  fastify.decorateRequest('article', null!);
+  fastify.decorateRequest('user', null!);
+  fastify.decorateRequest('comment', null!);
+  fastify.decorateRequest('tag', null!);
 
   fastify.addHook('onRequest', async (request, reply) => {
     if (!request.em) {
