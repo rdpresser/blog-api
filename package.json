@@ -19,6 +19,7 @@
     "@mikro-orm/sql-highlighter": "^1.0.1",
     "argon2": "^0.43.0",
     "fastify": "^5.4.0",
+    "fastify-plugin": "^5.0.1",
     "uuid": "^11.1.0"
   },
   "devDependencies": {
@@ -29,11 +30,11 @@
     "rimraf": "^6.0.1",
     "ts-node": "^10.9.2",
     "typescript": "^5.8.3",
-    "vitest": "^3.2.3"
+    "vitest": "^3.2.4"
   },
   "scripts": {
     "clean": "rimraf dist",
-    "orm-cache-combined": "npx mikro-orm-esm cache:generate --combined", 
+    "orm-cache-combined": "npx mikro-orm-esm cache:generate --combined",
     "db:migrate:create": "npx mikro-orm-esm migration:create --name ",
     "db:migrate:up": "npx mikro-orm-esm migration:up",
     "db:migrate:down": "npx mikro-orm-esm migration:down",

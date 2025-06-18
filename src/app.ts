@@ -1,32 +1,18 @@
-import { RequestContext } from '@mikro-orm/core';
+import './modules/common/fastify.module.js';
 import { fastify } from 'fastify';
+import ormPlugin from './modules/common/orm.plugin.js';
 import { initORM } from './db.js';
+import { registerArticleRoutes } from './modules/article/routes.js';
+import { registerUserRoutes } from './modules/user/routes.js';
 
 export async function bootstrap(port = 3000, host = '0.0.0.0', migrate = true) {
   const db = await initORM({}, migrate);
   const app = fastify();
 
-  // register request context hook
-  app.addHook('onRequest', (request, reply, done) => {
-    RequestContext.create(db.em, done);
-  });
-
-  // shut down the connection when closing the app
-  app.addHook('onClose', async () => {
-    await db.orm.close();
-  });
-
-  // register routes here
-  app.get('/article', async request => {
-    const { limit, offset } = request.query as { limit?: number; offset?: number };
-    const [items, total] = await db.article.findAndCount({}, {
-      limit, offset,
-    });
-
-    return { items, total };
-  });
+  await app.register(ormPlugin, { orm: db });
+  await app.register(registerArticleRoutes, { prefix: 'article' });
+  await app.register(registerUserRoutes, { prefix: 'user' });
 
   const url = await app.listen({ port, host });
-
   return { app, url };
 }

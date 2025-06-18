@@ -1,12 +1,14 @@
 import { afterAll, beforeAll, expect, test } from 'vitest';
 import { FastifyInstance } from 'fastify';
 import { initTestApp } from '../../common/utils.js';
+import { MikroORM } from '@mikro-orm/postgresql';
 
 let app: FastifyInstance;
+let orm: MikroORM
 
 beforeAll(async () => {
   // we use different ports to allow parallel testing
-  app = await initTestApp(30001, '0.0.0.0', true);
+  ({ app, orm } = await initTestApp(30001, '0.0.0.0', true));
 });
 
 afterAll(async () => {

@@ -1,10 +1,14 @@
-import { BeforeCreate, BeforeUpdate, Collection, Entity, EventArgs, OneToMany, Property } from '@mikro-orm/core';
+import { BeforeCreate, BeforeUpdate, Collection, Entity, EntityRepositoryType, EventArgs, OneToMany, Property } from '@mikro-orm/core';
 import { BaseEntity } from '../common/base.entity.js';
 import { Article } from '../article/article.entity.js';
 import { hash, verify } from 'argon2';
+import { UserRepository } from './user.repository.js';
 
-@Entity()
+@Entity({ repository: () => UserRepository })
 export class User extends BaseEntity<'bio'> {
+
+  // for automatic inference via `em.getRepository(User)`
+   [EntityRepositoryType]?: UserRepository;
 
    @Property()
    fullName!: string;

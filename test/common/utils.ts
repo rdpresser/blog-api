@@ -3,7 +3,7 @@ import { initORM } from '../../src/db.js';
 
 export async function initTestApp(port: number, host: string = '0.0.0.0', migrate = false) {
   // this will create all the ORM services and cache them
-  const { orm } = await initORM({
+  const orm = await initORM({
     // no need for debug information, it would only pollute the logs
     debug: false,
     // we will use in-memory database, this way we can easily parallelize our tests
@@ -15,10 +15,8 @@ export async function initTestApp(port: number, host: string = '0.0.0.0', migrat
   },
     migrate
   );
-
-  orm.schema.refreshDatabase();
   
   const { app } = await bootstrap(port, host, migrate);
 
-  return app;
+  return { app, orm };
 }
