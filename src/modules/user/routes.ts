@@ -27,11 +27,7 @@ export async function registerUserRoutes(app: FastifyInstance) {
   // login existing user
   app.post('/sign-in', async request => {
     const { email, password } = request.body as { email: string; password: string };
-    const user = await request.user.findOne({ email });
-
-    if (!user || !(await user.verifyPassword(password))) {
-      throw new Error('Invalid email or password');
-    }
+    const user = await request.user.login(email, password);    
 
     return user;
   });

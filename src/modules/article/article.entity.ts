@@ -4,10 +4,13 @@ import { User } from '../user/user.entity.js';
 import { Tag } from './tag.entity.js';
 import { Comment } from './comment.entity.js';
 
-function convertToSlug(text: string) {
+function convertToSlug(text: string | null | undefined): string {
+  if (!text) {
+    return '';
+  }
   return text.toLowerCase()
-             .replace(/[^\w ]+/g, '')
-             .replace(/ +/g, '-');
+    .replace(/[^\w ]+/g, '')
+    .replace(/ +/g, '-');
 }
 
 @Entity()
