@@ -59,5 +59,5 @@ test('login', async () => {
     });
 
     expect(res2.statusCode).toBe(401);
-    expect(res2.json()).toMatchObject({ message: 'Invalid combination of email and password' });
+    expect(res2.json()).toMatchObject({ error: 'Invalid combination of email and password' });
 });

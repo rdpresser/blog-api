@@ -12,9 +12,9 @@ declare module 'fastify' {
 
   interface FastifyRequest {
     em: EntityManager;
-    article: EntityRepository<Article>;
-    user: UserRepository;
-    comment: EntityRepository<Comment>;
-    tag: EntityRepository<Tag>;
+    articleRepository: EntityRepository<Article>;
+    userRepository: UserRepository;
+    commentRepository: EntityRepository<Comment>;
+    tagRepository: EntityRepository<Tag>;
   }
 }
