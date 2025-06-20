@@ -19,7 +19,8 @@ export async function registerUserRoutes(app: FastifyInstance) {
     user.bio = request.body.bio ?? '';
     await request.em.persist(user).flush();
 
-    user.token = app.jwt.sign({ id: user.id });
+    const userToken = { id: user.id, email: user.email, fullName: user.fullName };
+    user.token = app.jwt.sign(userToken);
 
     // after flush, we have the `user.id` set
     console.log(`User ${user.id} created`);
@@ -37,7 +38,8 @@ export async function registerUserRoutes(app: FastifyInstance) {
 
     const user = await request.userRepository.login(email, password);
 
-    user.token = app.jwt.sign({ id: user.id });
+    const userToken = { id: user.id, email: user.email, fullName: user.fullName };
+    user.token = app.jwt.sign(userToken);
 
     return user;
   });
